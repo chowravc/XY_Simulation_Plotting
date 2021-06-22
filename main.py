@@ -25,11 +25,18 @@ def making_mask():
 # Main bulk of code
 def main(inDir, name):
 
+	# IMPORTANT PUT EXPECTED NUMBER OF + AND - DEFECTS
+	pdNum = 2
+	ndNum = 2
+
+	# Saving zoom in on defects
+	pad = 20
+
 	# Clear plt
 	plt.clf()
 
 	# Reduction factor for vector field
-	reduction = 32
+	reduction = 20
 
 	## Reading files
 
@@ -42,7 +49,7 @@ def main(inDir, name):
 	# Reading defect locations
 	defectMat = np.loadtxt('input/' + inDir + '/label_' + name + '.dat')
 
-	## Storing values for vector plot
+	## Storing values for vector plot BIG PLOT
 	X = []
 	Y = []
 	U = []
@@ -130,9 +137,68 @@ def main(inDir, name):
 		os.mkdir('output/'+inDir+'/')
 
 	# Save figure. MAKE SURE THE EXPECTED NUMBER OF DEFECTS IS HERE. IMPORTANT!
-	if len(plusX) == 2 and len(minusX) == 2:
+	if len(plusX) == pdNum and len(minusX) == ndNum:
 
 		plt.savefig(tempStore, dpi=200)
+
+		# Create plus defect outdir
+		if len(glob.glob('output/' + inDir + '/plus/')) == 0:
+			os.mkdir('output/' + inDir + '/plus/')
+
+		# Create minus defect outdir
+		if len(glob.glob('output/' + inDir + '/minus/')) == 0:
+			os.mkdir('output/' + inDir + '/minus/')
+
+		# Save plus defect zooms
+		for i in range(len(plusX)):
+
+			zoomName = 'output/' + inDir + '/plus/' + name + '_d_' + str(plusX[i]) + '_' + str(plusY[i]) + '.tiff'
+
+			left = plusX[i] - pad
+			right = plusX[i] + pad
+
+			up = plusY[i] - pad
+			down = plusY[i] + pad
+
+			plt.clf()
+
+			## Plot results
+			plt.title(name+'_d_'+str(plusX[i])+'_'+str(plusY[i]))
+
+			# Plot image
+			plt.imshow(im)
+
+			# Zoom in
+			plt.xlim(left, right)
+			plt.ylim(up, down)
+
+			# Save figure
+			plt.savefig(zoomName)
+
+		for i in range(len(minusX)):
+
+			zoomName = 'output/' + inDir + '/minus/' + name + '_d_' + str(minusX[i]) + '_' + str(minusY[i]) + '.tiff'
+
+			left = minusX[i] - pad
+			right = minusX[i] + pad
+
+			up = minusY[i] - pad
+			down = minusY[i] + pad
+
+			plt.clf()
+
+			## Plot results
+			plt.title(name+'_d_'+str(plusX[i])+'_'+str(plusY[i]))
+
+			# Plot image
+			plt.imshow(im)
+
+			# Zoom in
+			plt.xlim(left, right)
+			plt.ylim(up, down)
+
+			# Save figure
+			plt.savefig(zoomName)
 
 		## Add polariser + analyser
 		# Reading mask
